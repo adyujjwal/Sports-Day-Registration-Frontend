@@ -36,10 +36,10 @@ To run this application, you need to have the following software installed:
 
 ```bash
 # Clone the repository to your local machine using Git:
-git clone https://github.com/your-username/sports-day-app.git
+git clone https://github.com/adyujjwal/sports-day-app.git
 
 # Navigate to the project directory:
-cd sports-day-app
+cd Sports-Day-Registration-Frontend
 
 # Install project dependencies:
 npm install
