@@ -155,6 +155,7 @@ const NewUserComponent = () => {
                     onClick={handleSignUp}
                     fullWidth
                     style={{ marginTop: '20px' }}
+                    data-testid="sign-up-button"
                 >
                     Sign Up
                 </Button>
