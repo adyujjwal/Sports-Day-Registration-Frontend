@@ -13,4 +13,4 @@ export const registerForEvent
     = (id, eventId) => apiClient.post(`/api/events/register?eventId=${eventId}&userId=${id}`)
 
 export const unregisterForEvent
-    = (id, eventId) => apiClient.post(`/api/events/unregister?eventId=${eventId}&userId=${id}`)
+    = (id, eventId) => apiClient.delete(`/api/events/unregister?eventId=${eventId}&userId=${id}`)
