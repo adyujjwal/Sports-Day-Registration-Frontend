@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react"
-import { useNavigate } from 'react-router-dom'
 import { retrieveAllEvents, retrieveSelectedEvents, registerForEvent, unregisterForEvent } from "./api/SportsDayApiService"
 import { useAuth } from "./security/AuthContext"
 import Grid from '@mui/material/Grid';
@@ -7,8 +6,22 @@ import EventList from './EventList';
 import Container from '@mui/material/Container';
 import SelectedEventsList from './SelectedEventsList';
 import Divider from '@mui/material/Divider';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { useTheme } from '@mui/material/styles';
+import Button from '@mui/material/Button'
+
 
 const EventRegistrationComponent = () => {
+    const [open, setOpen] = useState(false);
+    const [modalHeader, setModalHeader] = useState('');
+    const [modalBody, setModalBody] = useState('');
+    const theme = useTheme();
+    const fullScreen = useMediaQuery(theme.breakpoints.down('lg'));
     const [events, setEvents] = useState([]);
     const [selectedEvents, setSelectedEvents] = useState([]);
     const authContext = useAuth()
@@ -35,61 +48,60 @@ const EventRegistrationComponent = () => {
             });
     }, []);
 
+    const handleClose = () => {
+        setOpen(false);
+    };
+
     const doTimingsConflict = (selectedEvent, alreadySelectedEvents) => {
-        // Convert alreadySelectedEvents to an array if it's not
         if (!Array.isArray(alreadySelectedEvents)) {
             alreadySelectedEvents = [alreadySelectedEvents];
         }
 
-        // Convert the selected event's start and end times to Date objects
         const selectedEventStartTime = new Date(selectedEvent.startTime);
         const selectedEventEndTime = new Date(selectedEvent.endTime);
 
-        // Check for conflicts with each already selected event
         for (const alreadySelectedEvent of alreadySelectedEvents) {
-            // Convert the already selected event's start and end times to Date objects
             const alreadySelectedStartTime = new Date(alreadySelectedEvent.startTime);
             const alreadySelectedEndTime = new Date(alreadySelectedEvent.endTime);
 
-            // Check if the selected event's start time is between the already selected event's start and end times
             if (
                 selectedEventStartTime >= alreadySelectedStartTime &&
                 selectedEventStartTime < alreadySelectedEndTime
             ) {
-                return true; // Conflict found
+                return true;
             }
 
-            // Check if the selected event's end time is between the already selected event's start and end times
             if (
                 selectedEventEndTime > alreadySelectedStartTime &&
                 selectedEventEndTime <= alreadySelectedEndTime
             ) {
-                return true; // Conflict found
+                return true;
             }
 
-            // Check if the selected event completely overlaps with the already selected event
             if (
                 selectedEventStartTime <= alreadySelectedStartTime &&
                 selectedEventEndTime >= alreadySelectedEndTime
             ) {
-                return true; // Conflict found
+                return true; 
             }
         }
 
-        return false; // No conflicts found
+        return false;
     };
-
-
 
 
     const handleEventSelect = (event) => {
         console.log(event)
         if (selectedEvents.some(selectedEvent => doTimingsConflict(event, selectedEvent))) {
             if (selectedEvents.length === 3) {
-                alert('You can select a maximum of 3 events.');
+                setModalHeader('Maximum Registrations Reached');
+                setModalBody('You can select a maximum of 3 events.')
+                setOpen(true);
             }
             else {
-                alert('Event timings conflict with a selected event.');
+                setModalHeader('Conflict detected');
+                setModalBody('Event timings conflict with a selected event.')
+                setOpen(true);
             }
         } else if (selectedEvents.length < 3) {
             registerForEvent(id, event.id)
@@ -99,14 +111,16 @@ const EventRegistrationComponent = () => {
                 .catch((error) => {
                     console.error('Error registering event:', error);
                 });
-            //setSelectedEvents([...selectedEvents, event]);
         } else {
-            alert('You can select a maximum of 3 events.');
+            console.log("test")
+            setModalHeader('Maximum Registrations Reached');
+                setModalBody('You can select a maximum of 3 events.')
+                setOpen(true);
         }
     };
 
     const handleEventDeselect = (event) => {
-        unregisterForEvent(id, event.id) // Replace with the correct endpoint and request data
+        unregisterForEvent(id, event.id)
             .then(() => {
                 const updatedSelectedEvents = selectedEvents.filter((selectedEvent) => selectedEvent.id !== event.id);
                 setSelectedEvents(updatedSelectedEvents);
@@ -131,8 +145,27 @@ const EventRegistrationComponent = () => {
                     <SelectedEventsList selectedEvents={selectedEvents} onEventDeselect={handleEventDeselect} />
                 </Grid>
             </Grid>
-
-
+            <div>
+                <Dialog
+                    fullScreen={fullScreen}
+                    open={open}
+                    onClose={handleClose}
+                    aria-labelledby="responsive-dialog-title">
+                    <DialogTitle id="responsive-dialog-title">
+                        {modalHeader}
+                    </DialogTitle>
+                    <DialogContent>
+                        <DialogContentText>
+                            {modalBody}
+                        </DialogContentText>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={handleClose} autoFocus>
+                            OK
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+            </div>
         </Container>
     );
 }
