@@ -1,3 +1,6 @@
+![React](https://img.shields.io/badge/react-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB)
+![JavaScript](https://img.shields.io/badge/javascript-%23323330.svg?style=for-the-badge&logo=javascript&logoColor=%23F7DF1E)
+
 # Sports Day Event Registration App
 
 Welcome to the Sports Day Event Registration App! This application allows users to register for various sports events taking place during the sports day. Users can view the list of all events, select events to participate in, and manage their registrations.
